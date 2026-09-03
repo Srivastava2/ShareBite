@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
+import LandingPage from './pages/LandingPage'; // Import the new Landing Page
+import Home from './pages/Home';               // Home is now your Feed
 
 // Temporary placeholder components so the router doesn't crash
 // We will replace these with real files in the next phases!
-const Home = () => <div className="p-8 text-center text-2xl font-bold">Food Feed 🍕</div>;
 const Login = () => <div className="p-8 text-center text-2xl font-bold">Login Page 🔐</div>;
 const Register = () => <div className="p-8 text-center text-2xl font-bold">Register Page 📝</div>;
 const PostFood = () => <div className="p-8 text-center text-2xl font-bold">Post Food Form 🍲</div>;
@@ -12,14 +13,23 @@ const Dashboard = () => <div className="p-8 text-center text-2xl font-bold">My C
 function App() {
   return (
     <Router>
+      {/* 
+        Note: We removed the max-w-7xl and padding wrapper from the main layout 
+        here so the LandingPage hero section can stretch full width. 
+        You can add that padding back inside the Home/Feed component later.
+      */}
       <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
-        {/* Navbar stays at the top of all pages */}
         <Navbar />
         
-        {/* The main content area changes based on the URL */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* The public marketing page */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* The logged-in application feed */}
+            <Route path="/feed" element={<Home />} />
+            
+            {/* Auth and Utility Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/post-food" element={<PostFood />} />
