@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lit/react": "^1.0.8",
+    "@outerbase/astra-ui": "^0.8.16",
     "autoprefixer": "^10.5.4",
     "axios": "^1.19.0",
     "date-fns": "^4.4.0",
+    "lit": "^3.3.3",
     "lucide-react": "^1.31.0",
     "postcss": "^8.5.26",
     "react": "^19.2.8",
