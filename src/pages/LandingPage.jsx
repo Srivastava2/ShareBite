@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const FONT_IMPORT = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
@@ -106,25 +107,11 @@ const TICKER_ITEMS = [
 
 export default function LandingPage() {
   const tickerLoop = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#faf3e4] sb-sans text-[#24211b]">
       <style>{FONT_IMPORT}</style>
-
-      {/* Nav */}
-      <header className="sticky top-0 z-30 bg-[#faf3e4]/90 backdrop-blur border-b border-[#24211b]/10">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="sb-serif text-2xl font-semibold text-[#1f3d2b]">ShareBite</div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#3a3527]">
-            <a href="#how" className="hover:text-[#1f3d2b] transition-colors">How it works</a>
-            <a href="#board" className="hover:text-[#1f3d2b] transition-colors">The board</a>
-            <a href="#impact" className="hover:text-[#1f3d2b] transition-colors">Impact</a>
-          </nav>
-          <button className="px-4 py-2 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] text-sm font-semibold rounded-sm transition-colors">
-            Browse the feed
-          </button>
-        </div>
-      </header>
 
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -305,39 +292,47 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Impact */}
-      <section id="impact" className="py-24 px-6 bg-[#faf3e4]">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
-          {[
-            { n: '12.4k', l: 'meals reclaimed this year' },
-            { n: '9 tons', l: 'of food kept off campus trucks' },
-            { n: '86', l: 'clubs and dining halls posting' },
-          ].map((s, i) => (
-            <div key={i} className="text-center sb-drift" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className="sb-serif text-6xl font-semibold text-[#1f3d2b] mb-2">{s.n}</div>
-              <div className="text-[#4a4436]">{s.l}</div>
+      {/* 3. Real Impact Section */}
+      <section className="py-24 px-6 bg-green-50">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+          <div className="flex-1 w-full max-w-lg">
+            <img
+              src="https://images.unsplash.com/photo-1755599629285-91cc09a185c7?w=900&q=80&auto=format&fit=crop"
+              alt="Volunteers packing boxes of food for donation"
+              className="rounded-3xl shadow-2xl object-cover w-full h-80 border-4 border-white"
+            />
+          </div>
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-gray-900 mb-5">Real food, reaching real people</h2>
+            <p className="text-lg text-gray-600 mb-6 max-w-xl mx-auto lg:mx-0">
+              Every listing on ShareBite is surplus food that would otherwise be thrown away — packed up and handed to someone nearby instead of a landfill.
+            </p>
+            <div className="flex items-center justify-center lg:justify-start gap-8 text-sm">
+              <div>
+                <p className="text-2xl font-bold text-green-700">12,400+</p>
+                <p className="text-gray-500">Meals shared</p>
+              </div>
+              <div className="h-9 w-px bg-green-200" />
+              <div>
+                <p className="text-2xl font-bold text-green-700">4,000+</p>
+                <p className="text-gray-500">Community members</p>
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-24 px-6 bg-[#1f3d2b] text-center relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage: 'radial-gradient(#faf3e4 1px, transparent 1px)',
-            backgroundSize: '18px 18px',
-          }}
-        />
-        <div className="max-w-2xl mx-auto relative">
-          <h2 className="sb-serif text-4xl md:text-5xl font-semibold text-[#fdf8ec] mb-6">
-            Your next meal might already be posted.
-          </h2>
-          <p className="text-[#fdf8ec]/80 text-lg mb-10">
-            Join students across campus already saving food, and money, one claim at a time.
+      {/* 4. CTA Section */}
+      <section className="py-20 px-6 bg-gray-900 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to make an impact?</h2>
+          <p className="text-gray-400 text-lg mb-10">
+            Join hundreds of students already reducing food waste and sharing meals on campus.
           </p>
-          <button className="px-10 py-4 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold rounded-sm transition-colors text-lg">
+          <button 
+            onClick={() => navigate('/register')}
+            className="px-10 py-4 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold rounded-sm transition-colors text-lg"
+          >
             Create your free account
           </button>
         </div>

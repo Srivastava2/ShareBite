@@ -5,12 +5,9 @@ import api from '../services/api';
 
 // Photo credits (Unsplash License — free to use, no attribution required,
 // credited here anyway as good practice):
-//   Thali        — Zoshua Colah   (unsplash.com/@zoshuacolah)
-//   Food donation — Anosh Ahmed   (unsplash.com/@anoshahmeddubai)
+//   Thali — Zoshua Colah (unsplash.com/@zoshuacolah)
 const IMG_THALI =
   'https://images.unsplash.com/photo-1742281257707-0c7f7e5ca9c6?w=1400&q=80&auto=format&fit=crop';
-const IMG_DONATION =
-  'https://images.unsplash.com/photo-1755599629285-91cc09a185c7?w=500&q=80&auto=format&fit=crop';
 
 export default function Login() {
   const { login } = useAuth();
@@ -70,24 +67,7 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/70 to-emerald-950/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 via-transparent to-transparent" />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white w-full">
-          <Link to="/" className="flex items-center gap-2.5 w-fit">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur text-lg font-bold">
-              🌿
-            </span>
-            <span className="text-xl font-semibold tracking-tight">ShareBite</span>
-          </Link>
-
-          {/* Floating photo — food donation, layered over the main thali
-              background with a subtle float animation */}
-          <div className="relative h-40 xl:h-48 my-6">
-            <img
-              src={IMG_DONATION}
-              alt="Volunteers packing boxes of food for donation"
-              className="motion-safe:animate-[float_5s_ease-in-out_infinite] absolute left-1/2 -translate-x-1/2 top-2 h-32 w-56 xl:h-36 xl:w-64 rounded-2xl object-cover shadow-2xl ring-1 ring-white/20 -rotate-2 transition-transform hover:scale-105 hover:rotate-0"
-            />
-          </div>
-
+        <div className="relative z-10 flex flex-col justify-center p-12 xl:p-16 text-white w-full gap-16">
           <div className="max-w-md">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-200/80 mb-4">
               Good food deserves another chance
@@ -122,14 +102,8 @@ export default function Login() {
       {/* Right form panel */}
       <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-10">
         <div className="w-full max-w-sm">
-          {/* Mobile-only logo */}
+          {/* Mobile-only logo space (currently empty/commented out) */}
           <div className="flex lg:hidden items-center gap-2 mb-8 justify-center">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-700 text-white text-lg">
-              🌿
-            </span>
-            <span className="text-xl font-semibold tracking-tight text-slate-900">
-              ShareBite
-            </span>
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900">Welcome back!</h2>
