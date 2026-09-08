@@ -80,12 +80,12 @@ export default function Register() {
       <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-10 order-2 lg:order-1">
         <div className="w-full max-w-sm animate-[fadeInUp_0.5s_ease-out]">
           <div className="flex items-center gap-2 mb-8">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-700 text-white text-lg">
+           {/* <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-700 text-white text-lg">
               🌿
             </span>
             <span className="text-xl font-semibold tracking-tight text-slate-900">
               ShareBite
-            </span>
+            </span>*/}
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">

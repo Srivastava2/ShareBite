@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const FONT_IMPORT = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
@@ -106,25 +107,11 @@ const TICKER_ITEMS = [
 
 export default function LandingPage() {
   const tickerLoop = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#faf3e4] sb-sans text-[#24211b]">
       <style>{FONT_IMPORT}</style>
-
-      {/* Nav */}
-      <header className="sticky top-0 z-30 bg-[#faf3e4]/90 backdrop-blur border-b border-[#24211b]/10">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="sb-serif text-2xl font-semibold text-[#1f3d2b]">ShareBite</div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#3a3527]">
-            <a href="#how" className="hover:text-[#1f3d2b] transition-colors">How it works</a>
-            <a href="#board" className="hover:text-[#1f3d2b] transition-colors">The board</a>
-            <a href="#impact" className="hover:text-[#1f3d2b] transition-colors">Impact</a>
-          </nav>
-          <button className="px-4 py-2 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] text-sm font-semibold rounded-sm transition-colors">
-            Browse the feed
-          </button>
-        </div>
-      </header>
 
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -342,7 +329,10 @@ export default function LandingPage() {
           <p className="text-gray-400 text-lg mb-10">
             Join hundreds of students already reducing food waste and sharing meals on campus.
           </p>
-          <button className="px-10 py-4 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold rounded-sm transition-colors text-lg">
+          <button 
+            onClick={() => navigate('/register')}
+            className="px-10 py-4 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold rounded-sm transition-colors text-lg"
+          >
             Create your free account
           </button>
         </div>

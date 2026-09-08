@@ -67,14 +67,7 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/70 to-emerald-950/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/40 via-transparent to-transparent" />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white w-full">
-          <Link to="/" className="flex items-center gap-2.5 w-fit">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur text-lg font-bold">
-              🌿
-            </span>
-            <span className="text-xl font-semibold tracking-tight">ShareBite</span>
-          </Link>
-
+        <div className="relative z-10 flex flex-col justify-center p-12 xl:p-16 text-white w-full gap-16">
           <div className="max-w-md">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-200/80 mb-4">
               Good food deserves another chance
@@ -109,14 +102,8 @@ export default function Login() {
       {/* Right form panel */}
       <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-10">
         <div className="w-full max-w-sm">
-          {/* Mobile-only logo */}
+          {/* Mobile-only logo space (currently empty/commented out) */}
           <div className="flex lg:hidden items-center gap-2 mb-8 justify-center">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-700 text-white text-lg">
-              🌿
-            </span>
-            <span className="text-xl font-semibold tracking-tight text-slate-900">
-              ShareBite
-            </span>
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900">Welcome back!</h2>
