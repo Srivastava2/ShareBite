@@ -175,7 +175,37 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. CTA / Impact Section */}
+      {/* 3. Real Impact Section */}
+      <section className="py-24 px-6 bg-green-50">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+          <div className="flex-1 w-full max-w-lg">
+            <img
+              src="https://images.unsplash.com/photo-1755599629285-91cc09a185c7?w=900&q=80&auto=format&fit=crop"
+              alt="Volunteers packing boxes of food for donation"
+              className="rounded-3xl shadow-2xl object-cover w-full h-80 border-4 border-white"
+            />
+          </div>
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-gray-900 mb-5">Real food, reaching real people</h2>
+            <p className="text-lg text-gray-600 mb-6 max-w-xl mx-auto lg:mx-0">
+              Every listing on ShareBite is surplus food that would otherwise be thrown away — packed up and handed to someone nearby instead of a landfill.
+            </p>
+            <div className="flex items-center justify-center lg:justify-start gap-8 text-sm">
+              <div>
+                <p className="text-2xl font-bold text-green-700">12,400+</p>
+                <p className="text-gray-500">Meals shared</p>
+              </div>
+              <div className="h-9 w-px bg-green-200" />
+              <div>
+                <p className="text-2xl font-bold text-green-700">4,000+</p>
+                <p className="text-gray-500">Community members</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. CTA Section */}
       <section className="py-20 px-6 bg-gray-900 text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to make an impact?</h2>

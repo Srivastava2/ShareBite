@@ -5,12 +5,9 @@ import api from '../services/api';
 
 // Photo credits (Unsplash License — free to use, no attribution required,
 // credited here anyway as good practice):
-//   Thali        — Zoshua Colah   (unsplash.com/@zoshuacolah)
-//   Food donation — Anosh Ahmed   (unsplash.com/@anoshahmeddubai)
+//   Thali — Zoshua Colah (unsplash.com/@zoshuacolah)
 const IMG_THALI =
   'https://images.unsplash.com/photo-1742281257707-0c7f7e5ca9c6?w=1400&q=80&auto=format&fit=crop';
-const IMG_DONATION =
-  'https://images.unsplash.com/photo-1755599629285-91cc09a185c7?w=500&q=80&auto=format&fit=crop';
 
 export default function Login() {
   const { login } = useAuth();
@@ -77,16 +74,6 @@ export default function Login() {
             </span>
             <span className="text-xl font-semibold tracking-tight">ShareBite</span>
           </Link>
-
-          {/* Floating photo — food donation, layered over the main thali
-              background with a subtle float animation */}
-          <div className="relative h-40 xl:h-48 my-6">
-            <img
-              src={IMG_DONATION}
-              alt="Volunteers packing boxes of food for donation"
-              className="motion-safe:animate-[float_5s_ease-in-out_infinite] absolute left-1/2 -translate-x-1/2 top-2 h-32 w-56 xl:h-36 xl:w-64 rounded-2xl object-cover shadow-2xl ring-1 ring-white/20 -rotate-2 transition-transform hover:scale-105 hover:rotate-0"
-            />
-          </div>
 
           <div className="max-w-md">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-200/80 mb-4">
