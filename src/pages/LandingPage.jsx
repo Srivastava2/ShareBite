@@ -1,176 +1,306 @@
 import React from 'react';
-// If using react-router-dom, import Link to route to your login/signup or feed
-// import { Link } from 'react-router-dom'; 
 
-function HandoffIllustration() {
+const FONT_IMPORT = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes drift-in {
+  0% { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.sb-serif { font-family: 'Fraunces', serif; }
+.sb-sans { font-family: 'Inter', sans-serif; }
+.sb-hand { font-family: 'Caveat', cursive; }
+.sb-ticker-track {
+  animation: ticker-scroll 26s linear infinite;
+}
+.sb-drift {
+  animation: drift-in 0.7s ease-out both;
+}
+.sb-pin {
+  box-shadow: 0 10px 20px -8px rgba(36,33,27,0.35);
+}
+.sb-pin::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #e7c27a, #b5482f 70%);
+  box-shadow: 0 3px 4px rgba(0,0,0,0.35);
+}
+`;
+
+function Pin({ className = '' }) {
   return (
-    <svg
-      viewBox="0 0 600 520"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-auto"
-      role="img"
-      aria-label="Illustration of one person handing a bowl of food to another person"
-    >
-      {/* Soft background blobs */}
-      <ellipse cx="180" cy="430" rx="150" ry="28" fill="#DCFCE7" />
-      <ellipse cx="420" cy="440" rx="150" ry="28" fill="#FFEDD5" />
-      <circle cx="300" cy="230" r="210" fill="#F0FDF4" />
-
-      {/* Dashed motion arc from giver to receiver */}
-      <path
-        d="M 235 220 Q 300 160 365 220"
-        fill="none"
-        stroke="#86EFAC"
-        strokeWidth="3"
-        strokeDasharray="2 10"
-        strokeLinecap="round"
-      />
-
-      {/* Floating leaf, top left */}
-      <g transform="translate(90,90) rotate(-15)">
-        <path d="M0 20 C 0 4, 16 -6, 30 0 C 24 16, 8 24, 0 20 Z" fill="#4ADE80" />
-        <line x1="1" y1="19" x2="18" y2="6" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" />
-      </g>
-
-      {/* Floating location pin, top right */}
-      <g transform="translate(480,110)">
-        <path
-          d="M0 0 C 14 0, 24 10, 24 22 C 24 38, 0 58, 0 58 C 0 58, -24 38, -24 22 C -24 10, -14 0, 0 0 Z"
-          fill="#FDBA74"
-        />
-        <circle cx="0" cy="22" r="8" fill="#FFF7ED" />
-      </g>
-
-      {/* ---- Left figure: giver ---- */}
-      <g>
-        {/* legs */}
-        <rect x="150" y="340" width="20" height="70" rx="10" fill="#166534" />
-        <rect x="188" y="340" width="20" height="70" rx="10" fill="#166534" />
-        {/* body */}
-        <path
-          d="M140 260 C140 220, 170 200, 200 210 C 226 218, 236 250, 230 300 L 220 350 L 158 350 L 148 300 Z"
-          fill="#22C55E"
-        />
-        {/* extended arm holding basket */}
-        <path
-          d="M222 250 C 250 252, 268 262, 278 278"
-          fill="none"
-          stroke="#22C55E"
-          strokeWidth="22"
-          strokeLinecap="round"
-        />
-        {/* head */}
-        <circle cx="182" cy="182" r="34" fill="#F4C89B" />
-        {/* simple hair */}
-        <path d="M150 176 C 150 148, 214 148, 214 176 C 200 166, 164 166, 150 176 Z" fill="#5B3A29" />
-      </g>
-
-      {/* Basket being passed */}
-      <g transform="translate(300,270)">
-        <path d="M-38 0 L38 0 L28 34 C 18 42, -18 42, -28 34 Z" fill="#B45309" />
-        <path d="M-38 0 L38 0 L34 -10 L-34 -10 Z" fill="#D97706" />
-        <path d="M-20 -10 C -20 -30, 20 -30, 20 -10" fill="none" stroke="#92400E" strokeWidth="5" strokeLinecap="round" />
-        {/* food peeking out */}
-        <circle cx="-10" cy="-18" r="12" fill="#EF4444" />
-        <circle cx="12" cy="-20" r="11" fill="#FACC15" />
-        <circle cx="2" cy="-28" r="10" fill="#84CC16" />
-      </g>
-
-      {/* ---- Right figure: receiver, open hands ---- */}
-      <g>
-        {/* legs */}
-        <rect x="400" y="340" width="20" height="70" rx="10" fill="#9A3412" />
-        <rect x="438" y="340" width="20" height="70" rx="10" fill="#9A3412" />
-        {/* body */}
-        <path
-          d="M388 260 C 384 220, 412 200, 442 208 C 470 216, 480 250, 474 300 L 466 350 L 402 350 L 392 300 Z"
-          fill="#FB923C"
-        />
-        {/* extended arms receiving */}
-        <path
-          d="M394 258 C 366 258, 348 268, 336 282"
-          fill="none"
-          stroke="#FB923C"
-          strokeWidth="22"
-          strokeLinecap="round"
-        />
-        {/* open hand */}
-        <circle cx="330" cy="286" r="13" fill="#F4C89B" />
-        {/* head */}
-        <circle cx="432" cy="182" r="34" fill="#EBA36F" />
-        {/* simple hair */}
-        <path d="M400 172 C 404 144, 466 146, 464 174 C 448 162, 414 162, 400 172 Z" fill="#241C15" />
-      </g>
-    </svg>
+    <span
+      className={`absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full ${className}`}
+      style={{
+        background: 'radial-gradient(circle at 35% 30%, #e7c27a, #b5482f 70%)',
+        boxShadow: '0 3px 4px rgba(0,0,0,0.35)',
+      }}
+    />
   );
 }
 
-export default function LandingPage() {
+function TapeStrip({ className = '' }) {
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-800">
-      
-      {/* 1. Hero Section */}
-      <section className="relative bg-green-50 pt-20 pb-28 px-6 lg:px-8 overflow-hidden">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-          
-          {/* Text Content */}
-          <div className="flex-1 text-center lg:text-left z-10">
-            <div className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-green-700 font-semibold text-sm mb-6 border border-green-200">
-              🌱 For College Campuses
-            </div>
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-              Rescue Food.<br /> 
-              <span className="text-green-600">Stop Campus Waste.</span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-              The student-to-student platform to share extra meals from events, club meetings, and cafeterias. Don't let good food end up in the trash.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-              <button className="px-8 py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all">
-                Browse Campus Feed
-              </button>
-              <button className="px-8 py-3.5 bg-white text-green-700 border-2 border-green-200 hover:border-green-600 font-bold rounded-xl transition-all">
-                Share Surplus Food
-              </button>
-            </div>
-          </div>
+    <span
+      className={`absolute h-6 w-20 bg-[#f3ead8]/70 border border-white/40 ${className}`}
+      style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.12)' }}
+    />
+  );
+}
 
-          {/* Hero Illustration */}
-          <div className="flex-1 w-full max-w-lg relative z-10">
-            <div className="aspect-square bg-gradient-to-tr from-green-200 to-green-50 rounded-full absolute -top-4 -right-4 -z-10 blur-3xl opacity-50"></div>
-            <div className="bg-white rounded-3xl shadow-2xl border-4 border-white p-6">
-              <HandoffIllustration />
+function PinnedPhoto({ src, alt, caption, tag, rotate = '-rotate-2', size = 'aspect-[4/5]' }) {
+  return (
+    <div className={`relative ${rotate} sb-drift`}>
+      <Pin />
+      <div className="bg-white p-3 pb-5 rounded-sm sb-pin">
+        <div className={`${size} w-full overflow-hidden bg-[#e7ddc6]`}>
+          <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+        <p className="sb-hand text-[#3a2f1f] text-xl mt-2 leading-none">{caption}</p>
+        {tag && (
+          <span className="inline-block mt-2 text-[10px] tracking-wide font-semibold text-[#fdf8ec] bg-[#1f3d2b] px-2 py-1 rounded-sm">
+            {tag}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StepCard({ number, title, body, src, alt, rotate }) {
+  return (
+    <div className={`relative ${rotate} sb-drift`}>
+      <Pin />
+      <div className="bg-white rounded-sm sb-pin p-3 pb-6">
+        <div className="aspect-[5/4] w-full overflow-hidden bg-[#e7ddc6] mb-4">
+          <img src={src} alt={alt} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+        <div className="flex items-start gap-3 px-1">
+          <span className="sb-serif text-3xl text-[#b5482f] leading-none pt-1">{number}</span>
+          <div>
+            <h3 className="sb-serif text-xl font-semibold text-[#1f3d2b] mb-1">{title}</h3>
+            <p className="sb-sans text-[#4a4436] text-sm leading-relaxed">{body}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const TICKER_ITEMS = [
+  '12,400 meals reclaimed this year',
+  '86 campus organizations posting',
+  '3 minutes: average time to claim',
+  '9 tons of food kept out of the landfill',
+];
+
+export default function LandingPage() {
+  const tickerLoop = [...TICKER_ITEMS, ...TICKER_ITEMS];
+
+  return (
+    <div className="min-h-screen bg-[#faf3e4] sb-sans text-[#24211b]">
+      <style>{FONT_IMPORT}</style>
+
+      {/* Nav */}
+      <header className="sticky top-0 z-30 bg-[#faf3e4]/90 backdrop-blur border-b border-[#24211b]/10">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+          <div className="sb-serif text-2xl font-semibold text-[#1f3d2b]">ShareBite</div>
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#3a3527]">
+            <a href="#how" className="hover:text-[#1f3d2b] transition-colors">How it works</a>
+            <a href="#board" className="hover:text-[#1f3d2b] transition-colors">The board</a>
+            <a href="#impact" className="hover:text-[#1f3d2b] transition-colors">Impact</a>
+          </nav>
+          <button className="px-4 py-2 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] text-sm font-semibold rounded-sm transition-colors">
+            Browse the feed
+          </button>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: 'radial-gradient(#24211b 1px, transparent 1px)',
+            backgroundSize: '18px 18px',
+          }}
+        />
+        <div className="max-w-6xl mx-auto px-6 pt-16 pb-24 relative">
+          <div className="grid lg:grid-cols-2 gap-14 items-center">
+            <div className="sb-drift">
+              <span className="inline-block text-xs font-semibold tracking-wide text-[#1f3d2b] bg-[#d9c98f]/60 border border-[#1f3d2b]/15 rounded-full px-3 py-1 mb-6">
+                Built for college campuses
+              </span>
+              <h1 className="sb-serif text-5xl lg:text-6xl font-semibold text-[#1f3d2b] leading-[1.05] mb-6">
+                Extra food finds
+                <br />
+                a home, not a bin.
+              </h1>
+              <p className="text-lg text-[#4a4436] mb-9 max-w-md leading-relaxed">
+                ShareBite is the noticeboard for leftover meals — from club events, cafeterias,
+                and dorm kitchens — that gets posted, claimed, and eaten before it ever hits the trash.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="px-7 py-3.5 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] font-semibold rounded-sm transition-colors">
+                  Browse campus feed
+                </button>
+                <button className="px-7 py-3.5 bg-transparent border-2 border-[#1f3d2b] text-[#1f3d2b] hover:bg-[#1f3d2b] hover:text-[#faf3e4] font-semibold rounded-sm transition-colors">
+                  Share surplus food
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex justify-center lg:justify-end sb-drift" style={{ animationDelay: '0.15s' }}>
+              <div className="relative rotate-2 max-w-sm w-full">
+                <Pin className="scale-125" />
+                <div className="bg-white p-3 pb-6 rounded-sm sb-pin">
+                  <div className="aspect-[4/5] w-full overflow-hidden bg-[#e7ddc6]">
+                    <img
+                      src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?fm=jpg&q=80&w=1200&auto=format&fit=crop"
+                      alt="A sealed food box being handed off for pickup"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="sb-hand text-2xl text-[#3a2f1f] mt-3">sealed up, ready to go</p>
+                </div>
+                <TapeStrip className="-top-3 left-8 -rotate-6" />
+                <TapeStrip className="-bottom-3 right-6 rotate-3" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. How It Works Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-16">How ShareBite Works</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl font-bold mb-6">1</div>
-              <h3 className="text-xl font-bold mb-3">Snap & Post</h3>
-              <p className="text-gray-600">Have leftover catered food? Post a quick photo, quantity, and your campus location.</p>
-            </div>
-            
-            {/* Step 2 */}
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl font-bold mb-6">2</div>
-              <h3 className="text-xl font-bold mb-3">Claim Instantly</h3>
-              <p className="text-gray-600">Students nearby see the live feed and can lock in a claim before the food expires.</p>
-            </div>
-            
-            {/* Step 3 */}
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl font-bold mb-6">3</div>
-              <h3 className="text-xl font-bold mb-3">Meet & Eat</h3>
-              <p className="text-gray-600">Pick up the food, save money, and help divert perfectly good meals from the landfill.</p>
-            </div>
+      {/* Ticker */}
+      <div className="bg-[#1f3d2b] py-4 overflow-hidden border-y-4 border-[#d9a441]">
+        <div className="flex whitespace-nowrap sb-ticker-track w-max">
+          {tickerLoop.map((item, i) => (
+            <span key={i} className="flex items-center text-[#faf3e4] sb-serif text-lg px-8">
+              {item}
+              <span className="mx-8 w-1.5 h-1.5 rounded-full bg-[#d9a441] inline-block" />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* How it works */}
+      <section id="how" className="py-24 px-6 bg-[#faf3e4]">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-xl mb-16 sb-drift">
+            <h2 className="sb-serif text-4xl font-semibold text-[#1f3d2b] mb-4">
+              Pin it, claim it, eat it
+            </h2>
+            <p className="text-[#4a4436] text-lg leading-relaxed">
+              Three steps, same as posting a flyer on the board outside the dining hall —
+              except this one updates in real time.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10 pt-6">
+            <StepCard
+              number="01"
+              title="Snap & post"
+              body="Have leftover catered food? Photograph it, note the quantity, and drop a pin at your campus location."
+              src="https://images.unsplash.com/photo-1651525669944-00de65d3b8a5?fm=jpg&q=80&w=900&auto=format&fit=crop"
+              alt="A crate of apples checked and ready to be packed"
+              rotate="-rotate-2"
+            />
+            <StepCard
+              number="02"
+              title="Claim instantly"
+              body="Nearby students see the live board and can lock in a claim before the window closes."
+              src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?fm=jpg&q=80&w=900&auto=format&fit=crop"
+              alt="Packed food boxes staged for delivery"
+              rotate="rotate-1"
+            />
+            <StepCard
+              number="03"
+              title="Meet & eat"
+              body="Swing by, grab your share, and help keep a perfectly good meal out of the landfill."
+              src="https://images.unsplash.com/photo-1614018453562-77f6180ce036?fm=jpg&q=80&w=900&auto=format&fit=crop"
+              alt="A sealed food box delivered to the door"
+              rotate="-rotate-1"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Corkboard gallery */}
+      <section id="board" className="py-24 px-6 relative">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: '#c9a66b',
+            backgroundImage:
+              'radial-gradient(rgba(36,33,27,0.14) 1.5px, transparent 1.5px), radial-gradient(rgba(36,33,27,0.08) 1px, transparent 1px)',
+            backgroundSize: '26px 26px, 13px 13px',
+            backgroundPosition: '0 0, 6px 6px',
+          }}
+        />
+        <div className="max-w-6xl mx-auto relative">
+          <div className="max-w-xl mb-16 sb-drift">
+            <h2 className="sb-serif text-4xl font-semibold text-[#fdf8ec] mb-4">
+              What's on the board this week
+            </h2>
+            <p className="text-[#fdf8ec]/85 text-lg leading-relaxed">
+              A running snapshot of what students nearby have posted — real portions, real
+              pickup windows, gone within the hour.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-14">
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1449247666642-264389f5f5b1?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="A food box packed and labeled for pickup"
+              caption="packed and labeled"
+              tag="Ready to go"
+              rotate="-rotate-3"
+            />
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1593113630400-ea4288922497?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="Boxes loaded up for delivery"
+              caption="loaded up for delivery"
+              tag="In transit"
+              rotate="rotate-2"
+            />
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1651525669944-00de65d3b8a5?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="A crate of produce checked for quality before packing"
+              caption="quality checked, packed fresh"
+              tag="QA passed"
+              rotate="-rotate-1"
+            />
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1599059813005-11265ba4b4ce?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="Volunteers sorting a food donation drive"
+              caption="donation drive, packed today"
+              tag="Donation post"
+              rotate="rotate-3"
+            />
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1562709902-31c9a3b1ad5c?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="Two people sharing a box of fresh fruit"
+              caption="shared with a neighbor"
+              tag="Given away"
+              rotate="-rotate-2"
+            />
+            <PinnedPhoto
+              src="https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?fm=jpg&q=80&w=800&auto=format&fit=crop"
+              alt="Boxes of donated food ready for pickup"
+              caption="packed and ready for pickup"
+              tag="Ready for pickup"
+              rotate="rotate-1"
+            />
           </div>
         </div>
       </section>
@@ -212,12 +342,15 @@ export default function LandingPage() {
           <p className="text-gray-400 text-lg mb-10">
             Join hundreds of students already reducing food waste and sharing meals on campus.
           </p>
-          <button className="px-10 py-4 bg-green-500 hover:bg-green-400 text-gray-900 font-extrabold rounded-xl shadow-lg transition-all text-lg">
-            Create Your Free Account
+          <button className="px-10 py-4 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold rounded-sm transition-colors text-lg">
+            Create your free account
           </button>
         </div>
       </section>
 
+      <footer className="bg-[#16301f] text-[#fdf8ec]/60 text-sm py-8 px-6 text-center">
+        ShareBite &middot; built by students, for students
+      </footer>
     </div>
   );
 }
