@@ -33,49 +33,54 @@
 
 ---
 
-## Getting Started
+## Quickstart for Teammates 🚀
 
-### Prerequisites
-- Node.js (v18+)
-- MongoDB (running locally on port 27017 or MongoDB Atlas URI)
-
-### 1. Backend Setup
-
+### 1. Clone & Install
 ```bash
-cd backend
+git clone https://github.com/Srivastava2/ShareBite.git
+cd ShareBite
 npm install
 ```
+*(Running `npm install` in the root automatically installs both frontend and backend dependencies).*
 
-Ensure `backend/.env` is configured (a preconfigured `.env` is already provided):
-
+### 2. Configure Environment (`.env`)
+Create a `.env` file in the root or copy from `.env.example`:
+```bash
+cp .env.example .env
+```
+Inside `.env` (and `backend/.env`):
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/sharebite
 JWT_SECRET=sharebite_super_secret_jwt_key_2026
-CLIENT_URL=http://localhost:5173
 ```
+> **Note for teammates without local MongoDB**: If a teammate doesn't have MongoDB installed locally, they can sign up for a free cloud cluster at [MongoDB Atlas](https://www.mongodb.com/atlas) and set `MONGO_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/sharebite?retryWrites=true&w=majority`.
 
-Start the backend server:
-
+### 3. Start the Project (Backend + Frontend)
 ```bash
-# In backend directory
-npm run dev
-# or
-node server.js
-```
-
-The server runs at `http://localhost:5000`.
-
-### 2. Frontend Setup
-
-In the root project directory:
-
-```bash
-npm install
 npm run dev
 ```
+This single command runs **both**:
+- **Backend**: `http://localhost:5000`
+- **Frontend**: `http://localhost:5173`
 
-The frontend runs at `http://localhost:5173`.
+Open `http://localhost:5173` in your browser!
+
+---
+
+## Troubleshooting Common Teammate Issues
+
+1. **`MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017`**
+   - **Reason**: MongoDB is not installed or not running on their system.
+   - **Fix**: Either start the local MongoDB service (`mongod` / `net start MongoDB` on Windows, or `brew services start mongodb-community` on Mac), OR use a free MongoDB Atlas cloud connection URI in `.env`.
+
+2. **`Cannot find module 'express'` or `'cors'`**
+   - **Reason**: Backend dependencies were not installed.
+   - **Fix**: Run `npm install` in root (which triggers postinstall) or `cd backend && npm install`.
+
+3. **Missing `.env` file**
+   - **Reason**: Git ignores `.env` files for security.
+   - **Fix**: Copy `.env.example` to `.env` in both root and `backend/`.
 
 ---
 
