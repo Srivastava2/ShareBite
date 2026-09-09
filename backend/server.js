@@ -62,13 +62,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`ShareBite backend running on port ${PORT}`);
-    });
-}).catch((err) => {
-    console.error("Failed to connect to DB, starting server anyway...", err.message);
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`ShareBite backend running on port ${PORT} (no DB connection)`);
-    });
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`ShareBite backend running on port ${PORT}`);
+    connectDB();
 });
