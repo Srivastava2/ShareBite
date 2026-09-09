@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -19,6 +20,8 @@ export default function Register() {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    collegeId: '',
+    hostel: '',
     password: '',
     confirmPassword: '',
   });
@@ -56,18 +59,20 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      // Expects backend response shape: { token, user: {...} }
       const { data } = await api.post('/auth/register', {
         name: form.name.trim(),
         email: form.email,
         password: form.password,
+        collegeId: form.collegeId.trim() || 'Campus Student',
+        hostel: form.hostel.trim() || 'Main Campus',
       });
+      toast.success(`Welcome to ShareBite, ${data.user.name}!`);
       login(data.user, data.token);
-      navigate('/', { replace: true });
+      navigate('/feed', { replace: true });
     } catch (err) {
-      setServerError(
-        err?.response?.data?.message || 'Could not create your account. Try again.'
-      );
+      const msg = err?.response?.data?.message || 'Could not create your account. Try again.';
+      setServerError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -179,6 +184,36 @@ export default function Register() {
                   />
                 </div>
                 {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
+              </div>
+
+              {/* College ID & Hostel */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="collegeId" className="block text-sm font-medium text-slate-700 mb-1.5">
+                    College / Student ID
+                  </label>
+                  <input
+                    id="collegeId"
+                    type="text"
+                    value={form.collegeId}
+                    onChange={(e) => update('collegeId', e.target.value)}
+                    placeholder="e.g. CS-2024-88"
+                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-600/10"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="hostel" className="block text-sm font-medium text-slate-700 mb-1.5">
+                    Campus Hostel / Hall
+                  </label>
+                  <input
+                    id="hostel"
+                    type="text"
+                    value={form.hostel}
+                    onChange={(e) => update('hostel', e.target.value)}
+                    placeholder="e.g. Block B, Room 102"
+                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-600/10"
+                  />
+                </div>
               </div>
 
               {/* Password */}

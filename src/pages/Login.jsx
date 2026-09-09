@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -13,7 +14,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname === '/' || !location.state?.from?.pathname ? '/feed' : location.state.from.pathname;
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -32,15 +33,17 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      // Expects backend response shape: { token, user: {...} }
       const { data } = await api.post('/auth/login', {
         email: form.email,
         password: form.password,
       });
+      toast.success(`Welcome back, ${data.user?.name || 'friend'}!`);
       login(data.user, data.token);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || 'Invalid email or password.');
+      const msg = err?.response?.data?.message || 'Invalid email or password.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
