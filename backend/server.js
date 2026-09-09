@@ -62,7 +62,17 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`ShareBite backend running on port ${PORT}`);
     connectDB();
+});
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`\n[ERROR] Port ${PORT} is already in use by another process!`);
+        console.error(`- On Windows: Run 'netstat -ano | findstr :${PORT}' and terminate that process, or restart.`);
+        console.error(`- On macOS: Disable AirPlay Receiver in System Settings > General > AirDrop & AirPlay, or run: kill -9 $(lsof -ti :${PORT})\n`);
+    } else {
+        console.error(`[ERROR] Server failed to start:`, err.message);
+    }
 });
