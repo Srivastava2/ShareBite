@@ -1,3 +1,5 @@
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -11,19 +13,8 @@ const authController = require("./controllers/authController");
 const app = express();
 
 // CORS configuration
-const allowedOrigins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173"
-];
-
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(null, true); // Allow dev access
-        }
-    },
+    origin: true,
     credentials: true
 }));
 
@@ -72,12 +63,12 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`ShareBite backend running on port ${PORT}`);
     });
 }).catch((err) => {
     console.error("Failed to connect to DB, starting server anyway...", err.message);
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`ShareBite backend running on port ${PORT} (no DB connection)`);
     });
 });

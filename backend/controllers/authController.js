@@ -2,6 +2,8 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const JWT_SECRET = process.env.JWT_SECRET || "sharebite_super_secret_jwt_key_2026";
+
 const register = async (req, res) => {
     try {
         const { name, email, password, collegeId, hostel } = req.body;
@@ -10,7 +12,7 @@ const register = async (req, res) => {
                 message: "Name, email, and password are required"
             });
         }
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
         if (existingUser) {
             return res.status(409).json({
                 message: "Email already registered"
@@ -18,16 +20,16 @@ const register = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
-            name,
-            email: email.toLowerCase(),
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
             password: hashedPassword,
-            collegeId: collegeId || "Campus Student",
-            hostel: hostel || "Campus Residence"
+            collegeId: collegeId ? collegeId.trim() : "Campus Student",
+            hostel: hostel ? hostel.trim() : "Campus Residence"
         });
 
         const token = jwt.sign(
             { userId: user._id },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: "7d" }
         );
 
@@ -45,7 +47,7 @@ const register = async (req, res) => {
     } catch (error) {
         console.error("Register error:", error);
         res.status(500).json({
-            message: "Server error during registration"
+            message: error.message || "Server error during registration"
         });
     }
 };
@@ -60,7 +62,8 @@ const login = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const normalizedEmail = email.toLowerCase().trim();
+        const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
             return res.status(401).json({
@@ -68,7 +71,14 @@ const login = async (req, res) => {
             });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        let isPasswordCorrect = false;
+        try {
+            isPasswordCorrect = await bcrypt.compare(password, user.password);
+        } catch (bcryptErr) {
+            console.warn("Bcrypt comparison warning:", bcryptErr.message);
+            // Graceful fallback if password was saved in plain text
+            isPasswordCorrect = (password === user.password);
+        }
 
         if (!isPasswordCorrect) {
             return res.status(401).json({
@@ -78,7 +88,7 @@ const login = async (req, res) => {
 
         const token = jwt.sign(
             { userId: user._id },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: "7d" }
         );
 
@@ -95,9 +105,9 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Login error:", error.message);
+        console.error("Login error:", error);
         res.status(500).json({
-            message: "Server error during login"
+            message: error.message || "Server error during login"
         });
     }
 };
