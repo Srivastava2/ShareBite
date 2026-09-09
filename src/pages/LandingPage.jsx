@@ -138,10 +138,16 @@ export default function LandingPage() {
                 and dorm kitchens — that gets posted, claimed, and eaten before it ever hits the trash.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-7 py-3.5 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] font-semibold rounded-sm transition-colors">
+                <button 
+                  onClick={() => navigate('/feed')}
+                  className="px-7 py-3.5 bg-[#1f3d2b] hover:bg-[#16301f] text-[#faf3e4] font-semibold rounded-sm transition-colors cursor-pointer"
+                >
                   Browse campus feed
                 </button>
-                <button className="px-7 py-3.5 bg-transparent border-2 border-[#1f3d2b] text-[#1f3d2b] hover:bg-[#1f3d2b] hover:text-[#faf3e4] font-semibold rounded-sm transition-colors">
+                <button 
+                  onClick={() => navigate('/post-food')}
+                  className="px-7 py-3.5 bg-transparent border-2 border-[#1f3d2b] text-[#1f3d2b] hover:bg-[#1f3d2b] hover:text-[#faf3e4] font-semibold rounded-sm transition-colors cursor-pointer"
+                >
                   Share surplus food
                 </button>
               </div>

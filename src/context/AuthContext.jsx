@@ -11,9 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Decode token or fetch user profile from backend
-      // Assuming a /users/me endpoint exists to validate the token
-      api.get('/users/me')
+      api.get('/auth/me')
         .then((res) => setUser(res.data))
         .catch(() => {
           localStorage.removeItem('token');
@@ -36,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: Boolean(user) }}>
       {children}
     </AuthContext.Provider>
   );

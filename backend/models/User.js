@@ -15,11 +15,13 @@ const userSchema = new mongoose.Schema({
     },
     collegeId: {
         type: String,
-        required: true
+        default: "Campus Student"
     },
     hostel: {
         type: String,
-        required: true
+        default: "Main Campus"
     }
+}, {
+    timestamps: true
 });
 module.exports = mongoose.model("User", userSchema);

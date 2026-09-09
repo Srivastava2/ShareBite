@@ -10,8 +10,12 @@ const foodListingSchema = new mongoose.Schema({
         required: true
     },
     quantity: {
-        type: Number,
+        type: String,
         required: true
+    },
+    description: {
+        type: String,
+        default: ""
     },
     pickupLocation:{
         type:String, 
