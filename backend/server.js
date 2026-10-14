@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const foodRoutes = require("./routes/foodRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const authController = require("./controllers/authController");
 
@@ -23,6 +24,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/food", foodRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Alias /api/users/me for AuthContext compatibility
 app.get("/api/users/me", authMiddleware, authController.getMe);

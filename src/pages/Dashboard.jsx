@@ -7,23 +7,29 @@ import {
   Clock, 
   Trash2, 
   CheckCircle2, 
-  AlertCircle, 
-  Sparkles, 
   PlusCircle, 
   Utensils, 
   User, 
-  Building 
+  Building,
+  TrendingUp,
+  Leaf,
+  HeartHandshake,
+  Sparkles,
+  MessageSquare
 } from 'lucide-react';
+import AppShell from '../components/layout/AppShell';
 import { useAuth } from '../context/AuthContext';
+import { getFoodImage } from '../utils/foodAssets';
+import PickupCoordinationModal from '../components/coordination/PickupCoordinationModal';
 import api from '../services/api';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('shared'); // 'shared' | 'claimed'
   const [postedListings, setPostedListings] = useState([]);
   const [claimedListings, setClaimedListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [coordinatingItem, setCoordinatingItem] = useState(null);
 
   const fetchActivity = async () => {
     try {
@@ -44,7 +50,7 @@ export default function Dashboard() {
   }, []);
 
   const handleDeleteListing = async (foodId) => {
-    if (!window.confirm('Are you sure you want to remove this food listing?')) return;
+    if (!window.confirm('Are you sure you want to cancel this food listing?')) return;
 
     try {
       setDeletingId(foodId);
@@ -58,309 +64,281 @@ export default function Dashboard() {
     }
   };
 
-  const formatExpiry = (dateStr) => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diffMs = d - now;
-    if (diffMs <= 0) return 'Expired';
-    const diffMins = Math.round(diffMs / (1000 * 60));
-    if (diffMins < 60) return `${diffMins} mins left`;
-    const diffHours = Math.round(diffMins / 60);
-    return `${diffHours} hr${diffHours > 1 ? 's' : ''} left`;
-  };
+  const totalMealsSaved = claimedListings.length + postedListings.length;
+  const co2Prevented = (totalMealsSaved * 2.1).toFixed(1); // kg CO2 estimate
+  const localDonations = postedListings.length;
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <AppShell>
+      <div className="space-y-6 sm:space-y-8">
         
-        {/* User Welcome Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-emerald-700 text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-700/20">
+        {/* ================= USER PROFILE HEADER ================= */}
+        <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-6">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-700 text-white flex items-center justify-center text-xl sm:text-2xl font-black shadow-md shadow-emerald-600/20 shrink-0">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-stone-900">{user?.name || 'Student'}</h1>
-                <span className="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">
-                  Active Member
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-2xl font-black text-slate-900 truncate">
+                  {user?.name || 'Campus Student'}
+                </h1>
+                <span className="bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Campus Food Hero
                 </span>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone-500 mt-1">
-                <span className="flex items-center gap-1">
-                  <User size={14} /> {user?.collegeId || 'Campus Student'}
+              <p className="text-xs text-slate-500 mt-0.5">
+                {totalMealsSaved} meals shared & saved this semester
+              </p>
+
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-400 mt-2">
+                <span className="flex items-center gap-1 font-medium text-slate-600">
+                  <User size={12} className="text-emerald-600" /> {user?.collegeId || 'Student ID Verified'}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Building size={14} /> {user?.hostel || 'Main Campus'}
+                <span className="flex items-center gap-1 font-medium text-slate-600">
+                  <Building size={12} className="text-emerald-600" /> {user?.hostel || 'Main Campus'}
                 </span>
-                <span>• {user?.email}</span>
               </div>
             </div>
           </div>
 
           <Link
             to="/post-food"
-            className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 px-5 rounded-xl transition-all shadow-md shadow-emerald-700/20 text-sm whitespace-nowrap"
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-xs text-xs sm:text-sm whitespace-nowrap w-full sm:w-auto justify-center"
           >
-            <PlusCircle size={18} />
-            Post New Meal
+            <PlusCircle size={16} /> Share Surplus Food
           </Link>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-emerald-50 rounded-xl text-emerald-700">
-              <Utensils size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-stone-500">Meals Shared</p>
-              <p className="text-2xl font-extrabold text-stone-900">{postedListings.length}</p>
-            </div>
-          </div>
+        {/* ================= MY IMPACT CARDS (WAVE GRAPHICS) ================= */}
+        <div>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+            My Environmental & Community Impact
+          </h2>
 
-          <div className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-amber-50 rounded-xl text-amber-700">
-              <CheckCircle2 size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-stone-500">Meals Claimed</p>
-              <p className="text-2xl font-extrabold text-stone-900">{claimedListings.length}</p>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            
+            {/* Card 1: Total Meals Saved (Emerald) */}
+            <div className="bg-emerald-50/70 border border-emerald-100/90 rounded-2xl p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group">
+              <div>
+                <p className="text-xs font-bold text-emerald-800">Total Meals Saved</p>
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 mt-2">
+                  {totalMealsSaved || 0}
+                </p>
+              </div>
 
-          <div className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-teal-50 rounded-xl text-teal-700">
-              <Sparkles size={24} />
+              {/* Decorative SVG Wave Graph */}
+              <div className="mt-4 pt-2 -mx-5 -mb-5 opacity-80">
+                <svg viewBox="0 0 200 40" className="w-full h-10 stroke-emerald-600 fill-emerald-600/10 stroke-2">
+                  <path d="M 0 30 Q 50 10 100 25 T 200 15 L 200 40 L 0 40 Z" />
+                </svg>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-stone-500">Food Waste Avoided</p>
-              <p className="text-2xl font-extrabold text-stone-900">
-                {((postedListings.length + claimedListings.length) * 0.8).toFixed(1)} kg
-              </p>
+
+            {/* Card 2: CO2 Emissions Prevented (Teal) */}
+            <div className="bg-teal-50/70 border border-teal-100/90 rounded-2xl p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group">
+              <div>
+                <p className="text-xs font-bold text-teal-800">CO2 Emissions Prevented</p>
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 mt-2">
+                  {co2Prevented > 0 ? co2Prevented : '0.0'} <span className="text-base sm:text-lg font-bold text-slate-600">kg</span>
+                </p>
+              </div>
+
+              {/* Decorative SVG Wave Graph */}
+              <div className="mt-4 pt-2 -mx-5 -mb-5 opacity-80">
+                <svg viewBox="0 0 200 40" className="w-full h-10 stroke-teal-600 fill-teal-600/10 stroke-2">
+                  <path d="M 0 25 Q 50 5 100 18 T 200 28 L 200 40 L 0 40 Z" />
+                </svg>
+              </div>
             </div>
+
+            {/* Card 3: Local Donations Created (Amber) */}
+            <div className="bg-amber-50/70 border border-amber-100/90 rounded-2xl p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group">
+              <div>
+                <p className="text-xs font-bold text-amber-800">Campus Donations Created</p>
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 mt-2">
+                  {localDonations || 0}
+                </p>
+              </div>
+
+              {/* Decorative SVG Wave Graph */}
+              <div className="mt-4 pt-2 -mx-5 -mb-5 opacity-80">
+                <svg viewBox="0 0 200 40" className="w-full h-10 stroke-amber-500 fill-amber-500/10 stroke-2">
+                  <path d="M 0 15 Q 50 35 100 20 T 200 10 L 200 40 L 0 40 Z" />
+                </svg>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        {/* Tabs Bar */}
-        <div className="border-b border-stone-200 flex gap-8">
-          <button
-            onClick={() => setActiveTab('shared')}
-            className={`pb-4 text-base font-semibold transition-all relative ${
-              activeTab === 'shared'
-                ? 'text-emerald-700'
-                : 'text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            My Shared Food ({postedListings.length})
-            {activeTab === 'shared' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-700 rounded-full" />
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('claimed')}
-            className={`pb-4 text-base font-semibold transition-all relative ${
-              activeTab === 'claimed'
-                ? 'text-emerald-700'
-                : 'text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            My Claimed Meals ({claimedListings.length})
-            {activeTab === 'claimed' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-700 rounded-full" />
-            )}
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {loading ? (
-          <div className="py-16 text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent" />
-            <p className="text-stone-500 text-sm mt-3">Loading your activity...</p>
-          </div>
-        ) : activeTab === 'shared' ? (
-          /* Shared Tab */
-          postedListings.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-stone-200 shadow-sm max-w-lg mx-auto">
-              <span className="text-4xl mb-4 block">🍲</span>
-              <h3 className="text-lg font-bold text-stone-800">You haven't shared any meals yet</h3>
-              <p className="text-stone-500 text-sm mt-1 mb-6">
-                Have extra food from an event or dorm cooking? Post it to keep it out of the trash.
-              </p>
-              <Link
-                to="/post-food"
-                className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-5 py-2.5 rounded-xl transition-all text-sm"
-              >
-                <PlusCircle size={16} /> Share Surplus Food
+        {/* ================= DUAL COLUMN: RECENT CLAIMS VS CURRENT LISTINGS ================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
+          
+          {/* COLUMN 1: MY RECENT CLAIMS */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                <span>My Claimed Meals</span>
+                <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">
+                  {claimedListings.length}
+                </span>
+              </h3>
+              <Link to="/feed" className="text-xs font-semibold text-emerald-700 hover:underline">
+                Explore Feed &rarr;
               </Link>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {postedListings.map((item) => {
-                const isClaimed = item.status === 'CLAIMED';
-                const isExpired = item.status === 'EXPIRED' || new Date(item.bestBefore) <= new Date();
 
-                return (
+            {claimedListings.length === 0 ? (
+              <div className="py-10 text-center text-slate-400 text-xs">
+                <p className="font-semibold text-slate-600 text-sm">No claimed meals yet</p>
+                <p className="mt-1 text-slate-400 max-w-xs mx-auto text-xs">
+                  Browse the campus noticeboard to discover surplus food ready for immediate pickup.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {claimedListings.map((item) => (
                   <div
                     key={item._id}
-                    className="bg-white rounded-xl p-5 border border-stone-200 shadow-sm flex flex-col justify-between"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-slate-100 hover:bg-slate-50/80 transition-colors"
                   >
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-lg text-stone-900">{item.title}</h3>
-                            <span
-                              className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                                item.foodType === 'Veg'
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-red-100 text-red-700'
-                              }`}
-                            >
-                              {item.foodType}
-                            </span>
-                          </div>
-                          <p className="text-xs text-stone-400 mt-0.5">
-                            Posted on {new Date(item.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-
-                        <span
-                          className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                            isClaimed
-                              ? 'bg-amber-100 text-amber-800'
-                              : isExpired
-                              ? 'bg-stone-100 text-stone-500'
-                              : 'bg-emerald-100 text-emerald-800'
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </div>
-
-                      <div className="space-y-1.5 text-xs text-stone-600">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <img
+                        src={getFoodImage(item)}
+                        alt={item.title}
+                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Package size={14} className="text-stone-400" />
-                          <span>Quantity: {item.quantity}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin size={14} className="text-stone-400" />
-                          <span>Pickup: {item.pickupLocation}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock size={14} className="text-stone-400" />
-                          <span>Expiry: {formatExpiry(item.bestBefore)}</span>
-                        </div>
-                      </div>
-
-                      {/* Claimant info if claimed */}
-                      {isClaimed && item.claimedBy && (
-                        <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs">
-                          <p className="font-semibold text-amber-900 mb-1 flex items-center gap-1">
-                            <CheckCircle2 size={14} className="text-amber-700" />
-                            Claimed by {item.claimedBy.name}
-                          </p>
-                          <p className="text-amber-800/80">
-                            Hostel: {item.claimedBy.hostel || 'Campus'} • Contact: {item.claimedBy.email}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action button */}
-                    {!isClaimed && (
-                      <div className="mt-4 pt-3 border-t border-stone-100 flex justify-end">
-                        <button
-                          onClick={() => handleDeleteListing(item._id)}
-                          disabled={deletingId === item._id}
-                          className="text-red-600 hover:text-red-700 text-xs font-semibold flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                        >
-                          <Trash2 size={14} />
-                          {deletingId === item._id ? 'Deleting...' : 'Cancel & Remove'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )
-        ) : (
-          /* Claimed Tab */
-          claimedListings.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-stone-200 shadow-sm max-w-lg mx-auto">
-              <span className="text-4xl mb-4 block">🍽️</span>
-              <h3 className="text-lg font-bold text-stone-800">No claimed meals yet</h3>
-              <p className="text-stone-500 text-sm mt-1 mb-6">
-                Explore the active campus noticeboard to discover surplus food ready for immediate pickup.
-              </p>
-              <Link
-                to="/feed"
-                className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-5 py-2.5 rounded-xl transition-all text-sm"
-              >
-                Browse Campus Feed
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {claimedListings.map((item) => (
-                <div
-                  key={item._id}
-                  className="bg-white rounded-xl p-5 border border-emerald-100 shadow-sm flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-lg text-stone-900">{item.title}</h3>
-                          <span
-                            className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                              item.foodType === 'Veg'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}
-                          >
-                            {item.foodType}
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                            {item.title}
+                          </h4>
+                          <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md shrink-0">
+                            Claimed
                           </span>
                         </div>
-                        <p className="text-xs text-stone-400 mt-0.5">
-                          Claimed on {new Date(item.updatedAt || item.createdAt).toLocaleDateString()}
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          Pickup: {item.pickupLocation}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                          <Clock size={11} /> Claimed on {new Date(item.updatedAt || item.createdAt).toLocaleDateString()}
                         </p>
                       </div>
-
-                      <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <CheckCircle2 size={12} /> Ready for Pickup
-                      </span>
                     </div>
 
-                    <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-100 space-y-2 text-xs text-stone-700">
-                      <div className="flex items-center gap-2 font-medium">
-                        <MapPin size={15} className="text-emerald-700" />
-                        <span>Pickup Location: <strong>{item.pickupLocation}</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Package size={15} className="text-emerald-700" />
-                        <span>Quantity: {item.quantity}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock size={15} className="text-emerald-700" />
-                        <span>Best Before: {new Date(item.bestBefore).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ({formatExpiry(item.bestBefore)})</span>
-                      </div>
-                      {item.postedBy && (
-                        <div className="pt-2 border-t border-emerald-200/50 flex items-center justify-between text-[11px] text-stone-500">
-                          <span>Posted by: <strong>{item.postedBy.name}</strong> ({item.postedBy.hostel || 'Campus'})</span>
-                          <span>Contact: {item.postedBy.email}</span>
-                        </div>
-                      )}
-                    </div>
+                    {/* Coordinate Pickup Button */}
+                    <button
+                      onClick={() => setCoordinatingItem(item)}
+                      className="self-end sm:self-center flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors shrink-0 cursor-pointer"
+                    >
+                      <MessageSquare size={13} />
+                      <span>Coordinate Pickup</span>
+                    </button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* COLUMN 2: MY CURRENT LISTINGS */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                <span>My Food Listings</span>
+                <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">
+                  {postedListings.length}
+                </span>
+              </h3>
+              <Link to="/post-food" className="text-xs font-semibold text-emerald-700 hover:underline">
+                + Post Food
+              </Link>
             </div>
-          )
-        )}
+
+            {postedListings.length === 0 ? (
+              <div className="py-10 text-center text-slate-400 text-xs">
+                <p className="font-semibold text-slate-600 text-sm">No food posted yet</p>
+                <p className="mt-1 text-slate-400 max-w-xs mx-auto text-xs">
+                  Have leftover food from your dorm or club? Post it in 30 seconds!
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {postedListings.map((item) => {
+                  const isClaimed = item.status === 'CLAIMED';
+                  return (
+                    <div
+                      key={item._id}
+                      className="flex items-center gap-3.5 p-3 rounded-xl border border-slate-100 hover:bg-slate-50/80 transition-colors"
+                    >
+                      <img
+                        src={getFoodImage(item)}
+                        alt={item.title}
+                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                            {item.title}
+                          </h4>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 border ${
+                              isClaimed
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}
+                          >
+                            {isClaimed ? 'Claimed' : 'Available'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {item.quantity} • {item.pickupLocation}
+                        </p>
+                        
+                        <div className="flex items-center justify-between mt-1 text-[10px]">
+                          <span className="text-slate-400">
+                            Posted {new Date(item.createdAt).toLocaleDateString()}
+                          </span>
+                          
+                          <div className="flex items-center gap-2">
+                            {isClaimed && (
+                              <button
+                                onClick={() => setCoordinatingItem(item)}
+                                className="text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <MessageSquare size={11} /> Chat
+                              </button>
+                            )}
+                            {!isClaimed && (
+                              <button
+                                onClick={() => handleDeleteListing(item._id)}
+                                disabled={deletingId === item._id}
+                                className="text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 size={11} /> Cancel
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+        </div>
+
       </div>
-    </div>
+
+      {/* Pickup Coordination & Chat Modal */}
+      <PickupCoordinationModal
+        item={coordinatingItem}
+        isOpen={Boolean(coordinatingItem)}
+        onClose={() => setCoordinatingItem(null)}
+      />
+    </AppShell>
   );
 }

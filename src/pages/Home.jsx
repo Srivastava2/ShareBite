@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Utensils, PlusCircle, Sparkles, Inbox } from 'lucide-react';
-import FilterBar from '../components/feed/FilterBar';
+import { PlusCircle, Inbox, Sparkles, RefreshCw } from 'lucide-react';
+import AppShell from '../components/layout/AppShell';
 import FoodCard from '../components/feed/FoodCard';
+import { FeaturedDonorBanner, LeaderboardWidget } from '../components/feed/Leaderboard';
 import api from '../services/api';
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [selectedScale, setSelectedScale] = useState('All'); // 'All' | 'Individual' | 'Event'
 
   const fetchFoods = useCallback(async () => {
     try {
@@ -24,128 +26,173 @@ export default function Home() {
       }
 
       const res = await api.get('/food', { params });
-      setFoods(res.data.foodListings || []);
+      let list = res.data.foodListings || [];
+
+      // Filter by scale if specified
+      if (selectedScale === 'Event') {
+        list = list.filter(f => (f.title + ' ' + (f.description || '')).toLowerCase().includes('cater') || 
+                                (f.title + ' ' + (f.description || '')).toLowerCase().includes('event') ||
+                                (f.title + ' ' + (f.description || '')).toLowerCase().includes('platter') ||
+                                (f.title + ' ' + (f.description || '')).toLowerCase().includes('tray'));
+      } else if (selectedScale === 'Individual') {
+        list = list.filter(f => !(f.title + ' ' + (f.description || '')).toLowerCase().includes('cater') && 
+                                !(f.title + ' ' + (f.description || '')).toLowerCase().includes('platter'));
+      }
+
+      setFoods(list);
     } catch (err) {
       console.error('Fetch foods error:', err);
-      toast.error('Could not load meals. Please check your connection.');
+      toast.error('Could not load meals. Please verify backend connection.');
     } finally {
       setLoading(false);
     }
-  }, [search, selectedType]);
+  }, [search, selectedType, selectedScale]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchFoods();
-    }, 250);
+    }, 200);
     return () => clearTimeout(timer);
   }, [fetchFoods]);
 
   const handleClaimSuccess = (claimedId) => {
-    // Remove claimed meal from the live available feed
     setFoods((prev) => prev.filter((item) => item._id !== claimedId));
   };
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <AppShell searchTerm={search} onSearchChange={setSearch}>
+      <div className="space-y-6">
         
-        {/* Banner */}
-        <header className="relative overflow-hidden bg-gradient-to-br from-[#1f3d2b] to-[#152e20] text-white rounded-3xl p-8 sm:p-12 shadow-lg shadow-emerald-950/20">
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 bg-[#d9a441]/20 border border-[#d9a441]/30 text-[#e7c27a] text-xs font-semibold px-3 py-1 rounded-full mb-4">
-              <Sparkles size={14} /> Live Campus Noticeboard
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
-              Rescue Good Food on Campus
-            </h1>
-            <p className="text-stone-300 text-sm sm:text-base leading-relaxed mb-6">
-              Don’t let catered meals or extra snacks hit the trash. Spot available food near your dorm or department and claim it before time runs out.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                to="/post-food"
-                className="inline-flex items-center gap-2 bg-[#d9a441] hover:bg-[#c99530] text-[#1f3d2b] font-bold px-5 py-2.5 rounded-xl transition-all shadow-md text-sm"
+        {/* ================= HERO SPOTLIGHT: FEATURED DONOR ================= */}
+        <FeaturedDonorBanner />
+
+        {/* ================= FILTER / SCALE TABS ================= */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-2">
+          
+          {/* Dietary Filter Buttons */}
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-x-auto">
+            {['All', 'Veg', 'Non-Veg'].map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setSelectedType(type)}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all shrink-0 ${
+                  selectedType === type
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
               >
-                <PlusCircle size={18} />
-                Share Surplus Food
-              </Link>
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-5 py-2.5 rounded-xl transition-all text-sm border border-white/20"
-              >
-                My Activity
-              </Link>
-            </div>
+                {type === 'Veg' ? '🌱 Vegetarian' : type === 'Non-Veg' ? '🍗 Non-Veg' : 'All Diets'}
+              </button>
+            ))}
           </div>
 
-          {/* Subtle graphic accent */}
-          <div className="absolute right-4 -bottom-6 opacity-10 hidden sm:block pointer-events-none text-9xl">
-            🍲
-          </div>
-        </header>
-
-        {/* Filter and Search Bar */}
-        <FilterBar
-          search={search}
-          onSearchChange={setSearch}
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-          onRefresh={fetchFoods}
-          loading={loading}
-        />
-
-        {/* Food Listings Grid */}
-        {loading && foods.length === 0 ? (
-          <div className="py-20 text-center">
-            <div className="inline-block animate-spin rounded-full h-9 w-9 border-4 border-emerald-600 border-t-transparent mb-3" />
-            <p className="text-stone-500 text-sm">Finding active meals near you...</p>
-          </div>
-        ) : foods.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-stone-200 shadow-sm max-w-md mx-auto my-6 space-y-4">
-            <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto text-stone-400">
-              <Inbox size={32} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-stone-800">
-                {search || selectedType !== 'All' ? 'No meals match your filter' : 'No available food right now'}
-              </h3>
-              <p className="text-stone-500 text-xs sm:text-sm mt-1">
-                {search || selectedType !== 'All'
-                  ? 'Try changing your search terms or resetting the filter.'
-                  : 'Check back soon or be the first hero on campus to share extra food!'}
-              </p>
-            </div>
-            <div className="pt-2">
-              <Link
-                to="/post-food"
-                className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-emerald-700/20"
-              >
-                <PlusCircle size={16} /> Post Food Now
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between mb-4 px-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
-                Available Meals ({foods.length})
-              </p>
-              <span className="text-xs text-stone-400">Updates live</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {foods.map((food) => (
-                <FoodCard
-                  key={food._id}
-                  food={food}
-                  onClaimSuccess={handleClaimSuccess}
-                />
+          {/* Scale Filter Buttons (Individual vs Catering) */}
+          <div className="flex items-center justify-between sm:justify-end gap-2">
+            <span className="text-xs font-semibold text-slate-400 hidden sm:inline">Scale:</span>
+            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200/80 text-xs font-medium">
+              {[
+                { id: 'All', label: 'All Portions' },
+                { id: 'Individual', label: '🍱 Single / Dorm' },
+                { id: 'Event', label: '🎉 Catering' },
+              ].map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSelectedScale(s.id)}
+                  className={`px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
+                    selectedScale === s.id
+                      ? 'bg-slate-900 text-white font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {s.label}
+                </button>
               ))}
             </div>
+
+            <button
+              onClick={fetchFoods}
+              title="Refresh Feed"
+              className="p-2 bg-white text-slate-500 hover:text-emerald-600 border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+            </button>
           </div>
-        )}
+
+        </div>
+
+        {/* ================= 2-COLUMN MAIN CONTENT ================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT 8 COLUMNS: FEED LISTINGS */}
+          <div className="lg:col-span-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-extrabold text-base sm:text-lg text-slate-900 flex items-center gap-2">
+                <span>Campus Food Noticeboard</span>
+                <span className="text-xs font-bold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                  {foods.length} Available
+                </span>
+              </h2>
+              <span className="text-xs text-slate-400 hidden sm:inline">Live Campus Updates</span>
+            </div>
+
+            {loading && foods.length === 0 ? (
+              <div className="py-20 text-center bg-white rounded-2xl border border-slate-200/80">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-3 border-emerald-600 border-t-transparent mb-3" />
+                <p className="text-xs text-slate-500 font-medium">Loading live campus meals...</p>
+              </div>
+            ) : foods.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 sm:p-12 text-center border border-slate-200/80 space-y-4">
+                <div className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                  <Inbox size={28} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 text-base">No meals match your criteria</h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                    Try clearing filters or be the campus hero to post extra food from your dorm or club!
+                  </p>
+                </div>
+                <Link
+                  to="/post-food"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                >
+                  <PlusCircle size={15} /> Post Surplus Food
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {foods.map((food) => (
+                  <FoodCard
+                    key={food._id}
+                    food={food}
+                    onClaimSuccess={handleClaimSuccess}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT 4 COLUMNS: LEADERBOARD & STATS WIDGET */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+            <LeaderboardWidget />
+
+            {/* Campus Food Safety Tips Widget */}
+            <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
+                <Sparkles size={14} /> Campus Guidelines
+              </div>
+              <h4 className="font-extrabold text-sm leading-snug">
+                Always pick up meals within the designated window.
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Bring your own container or utensil when picking up from student lounges and cafeteria counters.
+              </p>
+            </div>
+          </div>
+
+        </div>
 
       </div>
-    </div>
+    </AppShell>
   );
 }
